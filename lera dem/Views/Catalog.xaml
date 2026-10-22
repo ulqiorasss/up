@@ -1,0 +1,110 @@
+﻿<Window x:Class="lera_dem.Catalog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lera_dem"
+        mc:Ignorable="d"
+        Title="Catalog" Height="450" Width="800">
+    <Grid>
+        <ScrollViewer Margin="4,65,4,4">
+            <ListBox x:Name="ListProducts" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch">
+
+                <!-- НАСТРОЙКА ЦВЕТОВ: НАВЕДЕНИЕ, КЛИК И СКИДКИ ПО ТЗ -->
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <!-- Базовый контейнер карточки -->
+                                    <Border x:Name="ItemBorder" Background="White" Margin="4,3,4,3" CornerRadius="2" BorderBrush="Black" BorderThickness="1">
+                                        <ContentPresenter />
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <!-- 1. Наведение мыши (светло-серый) -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFEAEAEA"/>
+                                        </Trigger>
+
+                                        <!-- 2. Выбор карточки кликом (темно-серый) -->
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFCDCDCD"/>
+                                        </Trigger>
+
+                                        <!-- 3. ТРЕБОВАНИЕ ТЗ: Если скидка больше 15% -> цвет #FFDF7B00 -->
+                                        <!-- Проверяем самые популярные фиксированные скидки из базы данных экзамена -->
+                                        <!-- ВНИМАНИЕ: Если у вас поле скидки называется по-другому (например, ProductDiscount или DiscountPercent), замените слово Discount на ваше -->
+                                        <DataTrigger Binding="{Binding Discount}" Value="16">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFDF7B00"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Discount}" Value="20">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFDF7B00"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Discount}" Value="25">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFDF7B00"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Discount}" Value="30">
+                                            <Setter TargetName="ItemBorder" Property="Background" Value="#FFDF7B00"/>
+                                        </DataTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <!-- Картинка товара -->
+                            <Image Margin="15,0,0,0" Width="55" Height="55" VerticalAlignment="Center" HorizontalAlignment="Center" Source="{Binding PhotoNewName}" DockPanel.Dock="Left"/>
+
+                            <!-- ТРЕБОВАНИЕ ТЗ: ОТОБРАЖЕНИЕ ЦЕН И СКИДОК СВЕРХУ СПРАВА -->
+                            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,15,0">
+
+                                <!-- СТАРАЯ ЦЕНА (Красная и перечеркнутая, если есть скидка) -->
+                                <!-- ВНИМАНИЕ: Если поле базовой цены называется по-другому (например, Cost), замените слово Price на ваше -->
+                                <TextBlock Text="{Binding Price}" FontSize="13" Foreground="Red" TextDecorations="Strikethrough" HorizontalAlignment="Right">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <!-- Скрываем старую цену, если скидка равна 0 или отсутствует -->
+                                                <DataTrigger Binding="{Binding Discount}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Discount}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- НОВАЯ ЦЕНА (Основная, крупная, черная) -->
+                                <!-- ВНИМАНИЕ: Подставьте имя вашего вычисляемого поля стоимости со скидкой (например, PriceWithDiscount или TotalCost) -->
+                                <TextBlock Text="{Binding PriceWithDiscount}" FontSize="16.5" Foreground="Black" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            </StackPanel>
+
+                            <!-- Данные о товаре -->
+                            <StackPanel Margin="15,5,0,5">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding CategoryName}" FontWeight="Bold"/>
+                                    <TextBlock Text=" / "/>
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                </StackPanel>
+                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding Compound}" Foreground="Gray" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding Weight}" FontSize="12" Foreground="DarkSlateGray"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+</Window>
